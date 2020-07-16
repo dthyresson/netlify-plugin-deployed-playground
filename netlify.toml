@@ -1,0 +1,12 @@
+[build]
+  command = "echo hello"
+  publish = "web/dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[plugins]]
+package = "./netlify-plugin-deploy-simulator"
+
