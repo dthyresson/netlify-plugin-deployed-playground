@@ -1,0 +1,11 @@
+{
+  "name": "netlify-plugin-deployed-playground",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:dthyresson/netlify-plugin-deployed-playground.git",
+  "author": "A. David Thyresson <david@stattleship.com>",
+  "license": "MIT",
+  "dependencies": {
+    "got": "^11.5.1"
+  }
+}
