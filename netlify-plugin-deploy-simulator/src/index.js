@@ -1,5 +1,6 @@
 module.exports = {
   onPreBuild: ({ utils }) => {
-    console.log('>>> onPreBuild')
+    console.log('>>> Failing in prebuild')
+    return utils.build.failBuild('Failure message')
   }
 }

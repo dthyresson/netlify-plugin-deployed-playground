@@ -8,5 +8,11 @@
   status = 200
 
 [[plugins]]
+package = "./netlify-plugin-deployed"
+  [plugins.inputs]
+  url = 'https://deployed.netlify.app'
+  #url = 'http://localhost:8910'
+
+[[plugins]]
 package = "./netlify-plugin-deploy-simulator"
 
