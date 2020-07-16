@@ -1,5 +1,5 @@
 {
-  "name": "netlify-plugin-depoloy-simulator",
+  "name": "netlify-plugin-deploy-simulator",
   "version": "0.1.0",
   "description": "Validates RedwoodJS environment variables when deploying to Netlify.",
   "keywords": [
@@ -9,9 +9,9 @@
     "env"
   ],
   "main": "./src/index.js",
-  "repository": "git@github.com:dthyresson/netlify-plugin-depoloy-simulator.git",
+  "repository": "git@github.com:dthyresson/netlify-plugin-deploy-simulator.git",
   "bugs": {
-    "url": "https://github.com/dthyresson/netlify-plugin-depoloy-simulator/issues"
+    "url": "https://github.com/dthyresson/netlify-plugin-deploy-simulator/issues"
   },
   "author": "A. David Thyresson <david@stattleship.com>",
   "license": "MIT",

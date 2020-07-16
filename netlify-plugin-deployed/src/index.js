@@ -1,4 +1,23 @@
 const got = require('got')
+const jwt = require('jsonwebtoken')
+
+let buildStartedAt = null
+let buildEndedAt = null
+let errorAt = null
+let successAt = null
+
+const now = () => {
+  return (new Date()).toJSON()
+}
+
+const timestamps = () => {
+  return {
+    buildStartedAt: buildStartedAt,
+    buildEndedAt: buildEndedAt,
+    errorAt: errorAt,
+    successAt: successAt,
+  }
+}
 
 const netlifyEnvs = {
   nodeVersion: process.env.NODE_VERSION,
@@ -41,6 +60,10 @@ const netlifyEnvs = {
   incomingHookBody: process.env.INCOMING_HOOK_BODY,
 }
 
+const payload = (options = {}) => {
+  return { ...netlifyEnvs, ...options, ...timestamps() }
+}
+
 const deployEndpoint = ({ inputs }) => {
   const baseUrl = inputs.url
   console.log(baseUrl)
@@ -49,42 +72,69 @@ const deployEndpoint = ({ inputs }) => {
 
 const send = async ({ inputs, payload }) => {
   try {
+    const token = 'token'
+    const secret = 'shhhhh'
+    const claims = {
+      audience: inputs.url,
+      issuer: 'netlify-plugin-deployed',
+      subject: process.env.SITE_ID || '',
+      expiresIn: '1h'
+    }
+    const signedPayload = jwt.sign({ data: payload }, secret, claims)
+
     const endpoint = deployEndpoint({ inputs })
-    console.log(endpoint)
+
     const { body } = await got.post(endpoint, {
       json: {
-        payload: payload,
+        payload: signedPayload,
+      },
+      headers: {
+        'X-Netlify-Plugin': 'DEPLOYED',
+        'Authorization': `Bearer ${token}`
       },
       responseType: 'json',
     })
 
     return body
   } catch (error) {
+    console.log('Failed to send')
     console.log(error)
     return { data: null }
   }
 }
 
 module.exports = {
-  onPostBuild: async ({ inputs }) => {
-
-    const body = await send({ inputs, payload: netlifyEnvs })
-
-    console.log(body.data)
-
+  onPreBuild: async () => {
+    buildStartedAt = now()
     return
   },
-  onError: async ({ inputs }) => {
+  onPostBuild: async ({ inputs }) => {
+    buildEndedAt = now()
+    return
+  },
+  onError: async ({ inputs, error, loadedFrom, origin }) => {
+    errorAt = now()
 
-    const body = await send({ inputs, payload: netlifyEnvs })
+
+    console.log('>> in onError')
+    console.log(loadedFrom)
+    console.log(origin)
+
+    console.log(error.name)
+    console.log(error.message)
+    console.log(error.stack)
+
+
+    const body = await send({ inputs, payload: payload({ status: 'error', error: { name: error.name, message: error.message } }) })
 
     console.log(body.data)
 
     return
   },
   onSuccess: async ({ inputs }) => {
+    successAt = now()
 
-    const body = await send({ inputs, payload: netlifyEnvs })
+    const body = await send({ inputs, payload: payload({ status: 'success' }) })
 
     console.log(body.data)
 
