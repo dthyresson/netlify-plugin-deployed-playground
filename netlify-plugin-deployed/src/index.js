@@ -22,7 +22,7 @@ const timestamps = () => {
 }
 
 const netlifyEnvs = {
-  id: process.env.DEPLOY_ID || 'aaa-bbb-ccc-111',
+  id: process.env.DEPLOY_ID || `${process.env.SITE_ID}-${Date.now()}`,
   nodeVersion: process.env.NODE_VERSION,
   nodeEnv: process.env.NODE_ENV,
   npmVersion: process.env.NPM_VERSION,
