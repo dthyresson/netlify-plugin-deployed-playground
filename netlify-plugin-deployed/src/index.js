@@ -36,7 +36,7 @@ const netlifyEnvs = {
   goVersion: process.env.GO_VERSION,
   goImportPath: process.env.GO_IMPORT_PATH,
   awsLambdaJsRuntime: process.env.AWS_LAMBDA_JS_RUNTIME,
-  ci: process.env.CI,
+  ci: (process.env.CI === 'true' ? true : false),
   gitLfsEnabled: process.env.GIT_LFS_ENABLED,
   gitLfsFetchInclude: process.env.GIT_LFS_FETCH_INCLUDE,
   netlify: (process.env.NETLIFY === 'true' ? true : false),
