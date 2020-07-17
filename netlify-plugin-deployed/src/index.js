@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const got = require('got')
 const jwt = require('jsonwebtoken')
 
@@ -20,6 +22,7 @@ const timestamps = () => {
 }
 
 const netlifyEnvs = {
+  id: process.env.DEPLOY_ID || 'aaa-bbb-ccc-111',
   nodeVersion: process.env.NODE_VERSION,
   nodeEnv: process.env.NODE_ENV,
   npmVersion: process.env.NPM_VERSION,
@@ -36,7 +39,7 @@ const netlifyEnvs = {
   ci: process.env.CI,
   gitLfsEnabled: process.env.GIT_LFS_ENABLED,
   gitLfsFetchInclude: process.env.GIT_LFS_FETCH_INCLUDE,
-  netlify: process.env.NETLIFY,
+  netlify: (process.env.NETLIFY === 'true' ? true : false),
   buildId: process.env.BUILD_ID,
   context: process.env.CONTEXT,
   systemArch: process.env._system_arch,
@@ -46,12 +49,11 @@ const netlifyEnvs = {
   head: process.env.HEAD,
   commitRef: process.env.COMMIT_REF,
   cachedCommitRef: process.env.CACHED_COMMIT_REF,
-  pullRequest: process.env.PULL_REQUEST,
+  pullRequest: (process.env.PULL_REQUEST === 'true' ? true : false),
   reviewId: process.env.REVIEW_ID,
   url: process.env.URL,
   deployUrl: process.env.DEPLOY_URL,
   deployPrimeUrl: process.env.DEPLOY_PRIME_URL,
-  deployId: process.env.DEPLOY_ID,
   siteName: process.env.SITE_NAME,
   siteId: process.env.SITE_ID,
   netlifyImagesCdnDomain: process.env.NETLIFY_IMAGES_CDN_DOMAIN,
@@ -72,12 +74,12 @@ const deployEndpoint = ({ inputs }) => {
 
 const send = async ({ inputs, payload }) => {
   try {
-    const token = 'token'
-    const secret = 'shhhhh'
+    const token = process.env.ACCESS_TOKEN
+    const secret = process.env.SITE_SECRET
     const claims = {
       audience: inputs.url,
       issuer: 'netlify-plugin-deployed',
-      subject: process.env.SITE_ID || '',
+      subject: process.env.SITE_ID,
       expiresIn: '1h'
     }
     const signedPayload = jwt.sign({ data: payload }, secret, claims)
@@ -115,17 +117,8 @@ module.exports = {
   onError: async ({ inputs, error, loadedFrom, origin }) => {
     errorAt = now()
 
-
-    console.log('>> in onError')
-    console.log(loadedFrom)
-    console.log(origin)
-
-    console.log(error.name)
-    console.log(error.message)
-    console.log(error.stack)
-
-
-    const body = await send({ inputs, payload: payload({ status: 'error', error: { name: error.name, message: error.message } }) })
+    const status = { status: 'error', errorName: error.name, errorMessage: error.message }
+    const body = await send({ inputs, payload: payload(status) })
 
     console.log(body.data)
 
