@@ -120,16 +120,12 @@ module.exports = {
     const status = { status: 'error', errorName: error.name, errorMessage: error.message }
     const body = await send({ inputs, payload: payload(status) })
 
-    console.log(body.data)
-
     return
   },
   onSuccess: async ({ inputs }) => {
     successAt = now()
 
     const body = await send({ inputs, payload: payload({ status: 'success' }) })
-
-    console.log(body.data)
 
     return
   },
